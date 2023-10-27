@@ -1,0 +1,73 @@
+<script setup>
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  const progressDom = document.querySelector('.progress');
+  const percent = progressDom.dataset.percent;
+  const circleDom = document.querySelector('.process-circle');
+  //通过getTotalLength方法获取圆环周长
+  const circleLen = circleDom.getTotalLength();
+  console.log(circleLen);
+
+  circleDom.style.strokeDashoffset = circleLen * (1 - parseInt(percent) / 100);
+  //监听进度改变的事件，实际开发中的数据可能通过ajax获取
+  document.querySelector('#range').addEventListener('change', (e) => {
+    circleDom.style.strokeDashoffset = circleLen * (1 - parseInt(e.target.value) / 100);
+    progressDom.dataset.percent = e.target.value + '%';
+  });
+});
+</script>
+
+<template>
+  <div class="example-wrapper">
+    <div class="title">Example1:svg进度条</div>
+    <div class="content">
+      <div data-name="loading" data-percent="26%" class="progress">
+        <svg height="200" width="200" viewBox="0 0 100 100">
+          <!--灰色的背景圆环-->
+          <circle cx="50" cy="50" r="40" stroke-width="5" stroke="#d1d3d7" fill="none"></circle>
+          <!--蓝色的动态圆环-->
+          <circle class="process-circle" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" stroke-width="5" stroke="#00a5e0" fill="none" stroke-linecap="round" stroke-dasharray="251"></circle>
+        </svg>
+      </div>
+      <div class="adjust">调整进度：<input value="26" type="range" min="0" max="100" id="range" /></div>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.progress {
+  display: inline-block;
+  position: relative;
+}
+
+.progress::before {
+  content: attr(data-percent);
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  font-size: 20px;
+  text-align: center;
+}
+
+.progress::after {
+  content: attr(data-name);
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  left: 0;
+  font-size: 25px;
+  text-align: center;
+}
+
+.process-circle {
+  stroke-dashoffset: 251;
+  transition: stroke-dashoffset 3s;
+}
+
+.adjust {
+  margin-top: 50px;
+}
+</style>
